@@ -41,7 +41,7 @@ pipeline {
         stage('Build Inference Image') {
             steps {
                 sh '''
-                docker build -t $IMAGE_NAME -f inference/Dockerfile .
+                docker build -t $IMAGE_NAME -f inference/Dockerfile inference/
                 '''
             }
         }
