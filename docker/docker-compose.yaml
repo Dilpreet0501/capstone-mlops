@@ -70,7 +70,7 @@ services:
       - mlruns:/mlruns
     command: airflow scheduler
 
-  inference:
+  api:
     build:
       context: ../inference
     container_name: inference-service
