@@ -5,7 +5,7 @@ pipeline {
         IMAGE_NAME = "california-inference"
         CONTAINER_NAME = "test-api"
 
-        MLFLOW_TRACKING_URI = "http://host.docker.internal:5001"
+        MLFLOW_TRACKING_URI = "http://host.docker.internal:5000"
         MLFLOW_MODEL_NAME  = "california_housing_model"
         MODEL_ALIAS        = "production"
     }
