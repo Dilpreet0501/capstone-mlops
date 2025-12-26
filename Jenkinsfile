@@ -21,22 +21,26 @@ pipeline {
             }
         }
 
-        stage('Test API') {
-            steps {
-                sh '''
-                docker run -d --name test-api \
-                  -p 8000:8000 \
-                  -e MLFLOW_TRACKING_URI=http://host.docker.internal:5001 \
-                  -e MLFLOW_MODEL_NAME=california_housing_model \
-                  -e MODEL_ALIAS=production \
-                  $IMAGE_NAME
+    stage('Test API') {
+        steps {
+            sh '''
+            docker run -d --name test-api -p 0:8000 \
+            -e MLFLOW_TRACKING_URI=http://host.docker.internal:5001 \
+            -e MLFLOW_MODEL_NAME=california_housing_model \
+            -e MODEL_ALIAS=production \
+            california-inference
 
-                sleep 15
-                curl http://localhost:8000/health
-                docker rm -f test-api
-                '''
-            }
+            sleep 15
+
+            PORT=$(docker inspect --format='{{(index (index .NetworkSettings.Ports "8000/tcp") 0).HostPort}}' test-api)
+            echo "API running on port $PORT"
+            curl http://localhost:$PORT/health
+
+            docker rm -f test-api
+            '''
         }
+  }
+
 
         stage('Deploy') {
             steps {
