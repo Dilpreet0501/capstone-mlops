@@ -24,7 +24,10 @@ pipeline {
                 sh '''
                 docker build -t fetch-mlflow-model -f jenkins/Dockerfile.fetch_model .
                 
-                # Run the container without a workspace mount
+                # Cleanup potential stale container
+                docker rm -f model-fetcher || true
+
+                # Run the container to fetch the model
                 docker run --name model-fetcher \
                     -v docker_mlruns:/mlruns \
                     -e MLFLOW_TRACKING_URI=http://host.docker.internal:5001 \
@@ -33,11 +36,13 @@ pipeline {
                     -e DEST_DIR=inference/model/production \
                     fetch-mlflow-model
 
-                # Copy the artifacts out of the container to the host workspace
+                # Explicitly cleanup the local directory to ensure a fresh copy
+                rm -rf inference/model/production
                 mkdir -p inference/model/production
+                
+                # Copy the artifacts out of the container
                 docker cp model-fetcher:/app/inference/model/production/. inference/model/production/
                 
-                # Cleanup the fetcher container
                 docker rm -f model-fetcher
 
                 # Verify files exist on the host
@@ -71,9 +76,10 @@ pipeline {
 
                 docker logs $CONTAINER_NAME || true
 
-                PORT=$(docker port $CONTAINER_NAME 8000/tcp | cut -d: -f2)
-
-                curl http://localhost:$PORT/health
+                # Use container IP for testing to avoid localhost/mapping issues in CI
+                IP=$(docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' $CONTAINER_NAME)
+                
+                curl http://$IP:8000/health
 
                 docker rm -f $CONTAINER_NAME
                 '''
