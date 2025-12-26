@@ -5,7 +5,7 @@ pipeline {
         IMAGE_NAME = "california-inference"
         CONTAINER_NAME = "test-api"
 
-        MLFLOW_TRACKING_URI = "http://host.docker.internal:5001"
+        MLFLOW_TRACKING_URI = "http://mlflow:5000"
         MLFLOW_EXPERIMENT_NAME = "california-housing"
         MLFLOW_MODEL_NAME  = "california_housing_model"
         MODEL_ALIAS        = "production"
@@ -29,8 +29,8 @@ pipeline {
 
                 # Run the container to fetch the model
                 docker run --name model-fetcher \
-                    -v docker_mlruns:/mlruns \
-                    -e MLFLOW_TRACKING_URI=http://host.docker.internal:5001 \
+                    -v mlruns:/mlruns \
+                    -e MLFLOW_TRACKING_URI=http://mlflow:5000 \
                     -e MLFLOW_MODEL_NAME=california_housing_model \
                     -e MODEL_ALIAS=production \
                     -e DEST_DIR=inference/model/production \
