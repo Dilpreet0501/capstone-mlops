@@ -19,7 +19,7 @@ pipeline {
             sh '''
             docker build -t fetch-mlflow-model -f jenkins/Dockerfile.fetch_model .
             docker run --rm \
-            -e MLFLOW_TRACKING_URI=http://mlflow:5000 \
+            -e MLFLOW_TRACKING_URI=http://mlflow:5001 \
             -e MLFLOW_MODEL_NAME=california_housing_model \
             -e MODEL_ALIAS=production \
             fetch-mlflow-model
