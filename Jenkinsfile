@@ -34,7 +34,7 @@ pipeline {
                 # Run the container to fetch the model
                 docker run --name model-fetcher \
                     --network docker_default \
-                    -v mlruns:/mlruns \
+                    -v docker_mlruns:/mlruns \
                     -e MLFLOW_TRACKING_URI=http://mlflow:5000 \
                     -e MLFLOW_MODEL_NAME=california_housing_model \
                     -e MODEL_ALIAS=production \
