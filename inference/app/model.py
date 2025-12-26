@@ -10,40 +10,35 @@ model = None
 def load_model():
     global model
 
-    print("--- Model Loading Debug ---")
-    print(f"Current working directory: {os.getcwd()}")
-    
-    # Foolproof recursive search for MLflow model (contains MLmodel file)
+    # 1. Self-contained image loading: Search for the MLflow model locally
     model_path = None
-    search_root = "/app"
-    print(f"Searching for MLflow model in {search_root}...")
-    
-    for root, dirs, files in os.walk(search_root):
+    # We search the app directory for an 'MLmodel' file which indicates an MLflow flavor
+    for root, dirs, files in os.walk("/app"):
         if "MLmodel" in files:
             model_path = root
-            print(f"✅ Found MLflow model at: {model_path}")
             break
             
     if model_path:
         try:
+            print(f"Loading local model from: {model_path}")
             model = mlflow.pyfunc.load_model(model_path)
-            print(f"Successfully loaded model from: {model_path}")
+            print("✅ Model loaded successfully from local artifact")
             return
         except Exception as e:
-            print(f"Failed to load from {model_path}: {e}")
+            print(f"⚠️ Failed to load local model from {model_path}: {e}")
 
-    # 2. Fallback to MLflow tracking server
-    print("No valid local model found in image, falling back to MLflow Tracking Server")
+    # 2. Remote Fallback: Load from MLflow Tracking Server
+    print("No local model found or failed to load; falling back to MLflow Server")
     mlflow.set_tracking_uri(settings.mlflow_tracking_uri)
     model_uri = f"models:/{settings.mlflow_model_name}@{settings.model_alias}"
 
     try:
-        print(f"Loading model from MLflow: {model_uri}")
+        print(f"Loading model from MLflow URI: {model_uri}")
         model = mlflow.pyfunc.load_model(model_uri)
-        print(f"✅ Model loaded from {model_uri}")
+        print(f"✅ Model loaded successfully from MLflow: {model_uri}")
     except Exception as e:
         model = None
-        print(f"❌ Failed to load model from {model_uri}")
+        print(f"❌ Critical: Failed to load model from any source: {model_uri}")
         raise e
 
 

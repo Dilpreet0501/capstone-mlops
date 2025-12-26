@@ -92,6 +92,12 @@ pipeline {
         stage('Deploy') {
             steps {
                 sh '''
+                # Identify and remove any container using port 8000 to avoid conflicts
+                ALREADY_RUNNING=$(docker ps -q --filter "publish=8000")
+                if [ ! -z "$ALREADY_RUNNING" ]; then
+                    docker rm -f $ALREADY_RUNNING
+                fi
+
                 docker rm -f inference-prod || true
 
                 docker run -d --name inference-prod -p 8000:8000 \
