@@ -6,6 +6,7 @@ pipeline {
         CONTAINER_NAME = "test-api"
 
         MLFLOW_TRACKING_URI = "http://host.docker.internal:5001"
+        MLFLOW_EXPERIMENT_NAME = "california-housing"
         MLFLOW_MODEL_NAME  = "california_housing_model"
         MODEL_ALIAS        = "production"
     }
@@ -51,6 +52,7 @@ pipeline {
                 sh '''
                 docker run -d --name $CONTAINER_NAME -p 0:8000 \
                   -e MLFLOW_TRACKING_URI=$MLFLOW_TRACKING_URI \
+                  -e MLFLOW_EXPERIMENT_NAME=$MLFLOW_EXPERIMENT_NAME \
                   -e MLFLOW_MODEL_NAME=$MLFLOW_MODEL_NAME \
                   -e MODEL_ALIAS=$MODEL_ALIAS \
                   $IMAGE_NAME
@@ -75,6 +77,7 @@ pipeline {
 
                 docker run -d --name inference-prod -p 8000:8000 \
                   -e MLFLOW_TRACKING_URI=$MLFLOW_TRACKING_URI \
+                  -e MLFLOW_EXPERIMENT_NAME=$MLFLOW_EXPERIMENT_NAME \
                   -e MLFLOW_MODEL_NAME=$MLFLOW_MODEL_NAME \
                   -e MODEL_ALIAS=$MODEL_ALIAS \
                   $IMAGE_NAME
