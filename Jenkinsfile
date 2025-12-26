@@ -22,15 +22,17 @@ pipeline {
             steps {
                 sh '''
                 docker build -t fetch-mlflow-model -f jenkins/Dockerfile.fetch_model .
+                # Mount the current directory to enable artifact persistence
                 docker run --rm \
-                    -v mlruns:/mlruns \
+                    -v $PWD:/app \
                     -e MLFLOW_TRACKING_URI=http://host.docker.internal:5001 \
                     -e MLFLOW_MODEL_NAME=california_housing_model \
                     -e MODEL_ALIAS=production \
+                    -e DEST_DIR=inference/model/production \
                     fetch-mlflow-model
                 '''
             }
-            }
+        }
 
 
 
