@@ -23,15 +23,25 @@ pipeline {
             steps {
                 sh '''
                 docker build -t fetch-mlflow-model -f jenkins/Dockerfile.fetch_model .
-                # Mount the current directory to enable artifact persistence
-                docker run --rm \
-                    -v $PWD:/workspace \
+                
+                # Run the container without a workspace mount
+                docker run --name model-fetcher \
                     -v docker_mlruns:/mlruns \
                     -e MLFLOW_TRACKING_URI=http://host.docker.internal:5001 \
                     -e MLFLOW_MODEL_NAME=california_housing_model \
                     -e MODEL_ALIAS=production \
-                    -e DEST_DIR=/workspace/inference/model/production \
+                    -e DEST_DIR=inference/model/production \
                     fetch-mlflow-model
+
+                # Copy the artifacts out of the container to the host workspace
+                mkdir -p inference/model/production
+                docker cp model-fetcher:/app/inference/model/production/. inference/model/production/
+                
+                # Cleanup the fetcher container
+                docker rm -f model-fetcher
+
+                # Verify files exist on the host
+                ls -R inference/model/production
                 '''
             }
         }
