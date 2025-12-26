@@ -23,15 +23,15 @@ pipeline {
                 sh '''
                 docker build -t fetch-mlflow-model -f jenkins/Dockerfile.fetch_model .
                 docker run --rm \
-                --network host \
-                -e MLFLOW_TRACKING_URI=http://localhost:5001 \
-                -e MLFLOW_MODEL_NAME=california_housing_model \
-                -e MODEL_ALIAS=production \
-                fetch-mlflow-model
-
+                    -v mlruns:/mlruns \
+                    -e MLFLOW_TRACKING_URI=http://host.docker.internal:5001 \
+                    -e MLFLOW_MODEL_NAME=california_housing_model \
+                    -e MODEL_ALIAS=production \
+                    fetch-mlflow-model
                 '''
             }
             }
+
 
 
 
