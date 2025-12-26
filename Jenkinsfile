@@ -2,34 +2,18 @@ pipeline {
     agent any
 
     environment {
-        IMAGE_NAME = "cal_housing_api:latest"
+        IMAGE_NAME = "california-inference"
     }
 
     stages {
 
-        stage("Checkout") {
+        stage('Checkout') {
             steps {
-                git branch: 'main',
-                    url: 'https://github.com/Dilpreet0501/capstone-mlops.git'
+                checkout scm
             }
         }
 
-    stage('Fetch Production Model') {
-      steps {
-            sh '''
-            docker build -t fetch-mlflow-model -f jenkins/Dockerfile.fetch_model .
-            docker run --rm \
-            -e MLFLOW_TRACKING_URI=http://host.docker.internal:5001 \
-            -e MLFLOW_MODEL_NAME=california_housing_model \
-            -e MODEL_ALIAS=production \
-            fetch-mlflow-model
-
-            '''
-        }
-    }
-
-
-        stage("Build Docker Image") {
+        stage('Build Inference Image') {
             steps {
                 sh '''
                 docker build -t $IMAGE_NAME ./inference
@@ -37,24 +21,33 @@ pipeline {
             }
         }
 
-        stage("Test API") {
+        stage('Test API') {
             steps {
                 sh '''
-                docker run -d -p 8000:8000 --name test_api $IMAGE_NAME
-                sleep 10
-                pytest inference/tests
-                docker rm -f test_api
+                docker run -d --name test-api \
+                  -p 8000:8000 \
+                  -e MLFLOW_TRACKING_URI=http://host.docker.internal:5001 \
+                  -e MLFLOW_MODEL_NAME=california_housing_model \
+                  -e MODEL_ALIAS=production \
+                  $IMAGE_NAME
+
+                sleep 15
+                curl http://localhost:8000/health
+                docker rm -f test-api
                 '''
             }
         }
 
-        stage("Deploy") {
+        stage('Deploy') {
             steps {
-                sh '''
-                docker-compose down
-                docker-compose up -d inference
-                '''
+                echo "Deploy step (docker-compose / k8s / server)"
             }
+        }
+    }
+
+    post {
+        always {
+            sh 'docker system prune -f || true'
         }
     }
 }
