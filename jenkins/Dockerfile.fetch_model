@@ -1,0 +1,9 @@
+FROM python:3.10-slim
+
+WORKDIR /app
+
+RUN pip install --no-cache-dir mlflow pandas scikit-learn
+
+COPY jenkins/fetch_model.py .
+
+CMD ["python", "fetch_model.py"]
