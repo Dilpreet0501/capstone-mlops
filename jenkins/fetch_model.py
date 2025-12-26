@@ -17,6 +17,10 @@ def fetch_model():
     print(f"Fetching model: {MODEL_NAME} ({MODEL_ALIAS})")
 
     try:
+        # Get model version details
+        model_version = client.get_model_version_by_alias(MODEL_NAME, MODEL_ALIAS)
+        print(f"Model version: {model_version.version}, run_id: {model_version.run_id}, source: {model_version.source}")
+        
         # Use standard model URI scheme
         model_uri = f"models:/{MODEL_NAME}@{MODEL_ALIAS}"
         
