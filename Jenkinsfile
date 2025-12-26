@@ -5,7 +5,7 @@ pipeline {
         IMAGE_NAME = "california-inference"
         CONTAINER_NAME = "test-api"
 
-        MLFLOW_TRACKING_URI = "http://host.docker.internal:5000"
+        MLFLOW_TRACKING_URI = "http://host.docker.internal:5001"
         MLFLOW_MODEL_NAME  = "california_housing_model"
         MODEL_ALIAS        = "production"
     }
@@ -22,15 +22,15 @@ pipeline {
             steps {
                 sh '''
                 docker build -t fetch-mlflow-model -f jenkins/Dockerfile.fetch_model .
-
                 docker run --rm \
-                  -e MLFLOW_TRACKING_URI=$MLFLOW_TRACKING_URI \
-                  -e MLFLOW_MODEL_NAME=$MLFLOW_MODEL_NAME \
-                  -e MODEL_ALIAS=$MODEL_ALIAS \
-                  fetch-mlflow-model
+                -e MLFLOW_TRACKING_URI=http://host.docker.internal:5001 \
+                -e MLFLOW_MODEL_NAME=california_housing_model \
+                -e MODEL_ALIAS=production \
+                fetch-mlflow-model
                 '''
             }
         }
+
 
         stage('Build Inference Image') {
             steps {
