@@ -29,7 +29,8 @@ services:
         "--host", "0.0.0.0",
         "--port", "5000",
         "--backend-store-uri", "file:///mlruns",
-        "--default-artifact-root", "file:///mlruns"
+        "--default-artifact-root", "file:///mlruns",
+        "--serve-artifacts"
       ]
 
   airflow-webserver:
@@ -79,7 +80,7 @@ services:
       mlflow:
         condition: service_started
     environment:
-      MLFLOW_TRACKING_URI: http://mlflow:5000
+      MLFLOW_TRACKING_URI: hc
       MLFLOW_EXPERIMENT_NAME: california-housing
       MLFLOW_MODEL_NAME: california_housing_model
       MODEL_ALIAS: production
