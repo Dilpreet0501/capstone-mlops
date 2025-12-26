@@ -65,6 +65,9 @@ pipeline {
         stage('Test API') {
             steps {
                 sh '''
+                # Cleanup potential stale container from previous run
+                docker rm -f $CONTAINER_NAME || true
+
                 docker run -d --name $CONTAINER_NAME -p 0:8000 \
                   -e MLFLOW_TRACKING_URI=$MLFLOW_TRACKING_URI \
                   -e MLFLOW_EXPERIMENT_NAME=$MLFLOW_EXPERIMENT_NAME \
