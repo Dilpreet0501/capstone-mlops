@@ -1,6 +1,10 @@
 pipeline {
     agent any
 
+    options {
+        skipDefaultCheckout()
+    }
+
     environment {
         IMAGE_NAME = "california-inference"
         CONTAINER_NAME = "test-api"
