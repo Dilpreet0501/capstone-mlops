@@ -1,0 +1,9 @@
+pydantic>=2.0
+pydantic-settings>=2.0
+fastapi
+uvicorn
+mlflow-skinny
+scikit-learn
+numpy
+pandas
+prometheus-fastapi-instrumentator
