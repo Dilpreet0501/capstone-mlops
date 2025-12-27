@@ -107,7 +107,7 @@ pipeline {
             steps {
                 sh '''
                 # Update the running service using the newly built image
-                cd docker && docker-compose up -d api
+                cd docker && docker compose up -d api
                 '''
             }
         }

@@ -4,7 +4,7 @@ USER root
 
 # Install Docker CLI
 RUN apt-get update && \
-    apt-get install -y docker.io && \
+    apt-get install -y docker.io docker-compose-plugin && \
     apt-get clean
 
 # Add Jenkins user to docker group
