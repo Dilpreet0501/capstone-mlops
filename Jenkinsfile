@@ -36,24 +36,27 @@ pipeline {
                 docker run --name model-fetcher \
                     --network docker_default \
                     -v docker_mlruns:/mlruns \
-                    -e MLFLOW_TRACKING_URI=http://mlflow:5000 \
+                    -e MLFLOW_TRACKING_URI=${MLFLOW_TRACKING_URI} \
                     -e MLFLOW_MODEL_NAME=${MLFLOW_MODEL_NAME} \
                     -e MODEL_ALIAS=${MODEL_ALIAS} \
                     -e DEST_DIR=model \
                     fetch-mlflow-model
 
-                # Pull the model to a local directory in the workspace
+                # Clean up local workspace model directory
                 rm -rf model
+                
+                # Pull the model from the container to the local workspace
                 docker cp model-fetcher:/app/model .
                 
-                # Move/Copy to inference directory for Docker build context
+                # Prepare the inference directory for the Docker build context (Bake-in)
                 rm -rf inference/model
-                cp -r model inference/model
+                cp -r model/ inference/model
                 
+                # Cleanup fetcher container
                 docker rm -f model-fetcher
                 
-                # Verify files exist
-                ls -R model
+                # Verify files exist in the workspace for the build stage
+                ls -R inference/model
                 '''
             }
         }
@@ -91,8 +94,8 @@ pipeline {
         stage('Deploy') {
             steps {
                 sh '''
-                # Update the running service
-                cd docker && docker-compose down && docker-compose up -d api
+                # Update the running service using the newly built image
+                cd docker && docker-compose up -d api
                 '''
             }
         }

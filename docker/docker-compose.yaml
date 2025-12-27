@@ -71,6 +71,7 @@ services:
     command: airflow scheduler
 
   api:
+    image: cal_housing_api:latest
     build:
       context: ../inference
     container_name: inference-service

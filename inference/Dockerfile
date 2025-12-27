@@ -9,8 +9,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . .
 
-# Ensure the model directory exists and is copied (Bake-in pattern)
-# The fetch-model script pulls to inference/model/
+# Copy the model directory from the build context (Bake-in pattern)
 COPY model/ /app/model/
 
 EXPOSE 8000
