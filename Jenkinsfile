@@ -76,8 +76,13 @@ pipeline {
                 # Cleanup potential stale container
                 docker rm -f ${CONTAINER_NAME} || true
 
-                # Start the container with network access and no port mapping
-                docker run -d --name ${CONTAINER_NAME} --network docker_default ${IMAGE_NAME}:${IMAGE_TAG}
+                # Start the container with network access and required env vars
+                docker run -d --name ${CONTAINER_NAME} \
+                    --network docker_default \
+                    -e MLFLOW_TRACKING_URI=${MLFLOW_TRACKING_URI} \
+                    -e MLFLOW_MODEL_NAME=${MLFLOW_MODEL_NAME} \
+                    -e MODEL_ALIAS=${MODEL_ALIAS} \
+                    ${IMAGE_NAME}:${IMAGE_TAG}
                 
                 # Wait for API to be ready
                 sleep 20
