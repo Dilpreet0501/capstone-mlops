@@ -28,7 +28,7 @@ def ingest_data():
     os.makedirs(SKLEARN_DATA_PATH, exist_ok=True)
     os.makedirs(os.path.dirname(DATA_PATH), exist_ok=True)
     
-    # URL for California housing dataset (from sklearn source)
+    # URL for sklearn source
     url = "https://ndownloader.figshare.com/files/5976036"
     headers = {"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"}
     
@@ -37,7 +37,7 @@ def ingest_data():
         response = requests.get(url, headers=headers, timeout=30)
         response.raise_for_status()
         
-        # Save to the directory sklearn expects
+    
         tar_path = os.path.join(SKLEARN_DATA_PATH, "cal_housing.tgz")
         with open(tar_path, "wb") as f:
             f.write(response.content)
@@ -48,11 +48,11 @@ def ingest_data():
         
     except Exception as e:
         print(f"Primary download failed: {e}. Falling back to Github mirror.")
-        # Fallback to a mirror or direct CSV if Figshare is down
+        
         fallback_url = "https://raw.githubusercontent.com/ageron/handson-ml/master/datasets/housing/housing.csv"
         df_raw = pd.read_csv(fallback_url)
         
-        # Transform Github format to match scikit-learn format
+        
         df = pd.DataFrame()
         df['MedInc'] = df_raw['median_income']
         df['HouseAge'] = df_raw['housing_median_age']
@@ -64,7 +64,7 @@ def ingest_data():
         df['Longitude'] = df_raw['longitude']
         df['MedHouseVal'] = df_raw['median_house_value'] / 100000.0
         
-        # Drop rows with nulls (Github version has some in total_bedrooms)
+        
         df = df.dropna()
 
     print(f"Saving {len(df)} rows to {DATA_PATH}")

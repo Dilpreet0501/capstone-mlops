@@ -5,7 +5,7 @@ from mlflow.tracking import MlflowClient
 
 MODEL_NAME = os.environ["MLFLOW_MODEL_NAME"]
 MODEL_ALIAS = os.environ.get("MODEL_ALIAS", "production")
-# DEST_DIR should be relative to the workspace to be preserved
+
 DEST_DIR = os.environ.get("DEST_DIR", "inference/model/production")
 
 tracking_uri = os.getenv("MLFLOW_TRACKING_URI", "http://localhost:5000")
@@ -17,11 +17,11 @@ def fetch_model():
     print(f"Fetching model: {MODEL_NAME} ({MODEL_ALIAS})")
 
     try:
-        # Get model version details
+      
         model_version = client.get_model_version_by_alias(MODEL_NAME, MODEL_ALIAS)
         print(f"Model version: {model_version.version}, run_id: {model_version.run_id}, source: {model_version.source}")
         
-        # Use standard model URI scheme
+        
         model_uri = f"models:/{MODEL_NAME}@{MODEL_ALIAS}"
         
         if os.path.exists(DEST_DIR):
@@ -39,9 +39,9 @@ def fetch_model():
             dst_path=DEST_DIR
         )
 
-        print(f"✅ Model downloaded to {local_path}")
+        print(f"Model downloaded to {local_path}")
     except Exception as e:
-        print(f"❌ Failed to fetch model: {e}")
+        print(f"Failed to fetch model: {e}")
         raise e
 
 if __name__ == "__main__":

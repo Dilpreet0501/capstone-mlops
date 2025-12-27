@@ -5,5 +5,4 @@ requests
 mlflow==2.10.0
 onnx==1.15.0
 skl2onnx==1.16.0
-
 apache-airflow-providers-docker
