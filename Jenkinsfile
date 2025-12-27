@@ -106,6 +106,8 @@ pipeline {
         stage('Deploy') {
             steps {
                 sh '''
+                # Ensure a placeholder .env exists so docker compose doesn't fail on validation
+                touch .env
                 # Update the running service using the newly built image
                 cd docker && docker compose up -d api
                 '''
