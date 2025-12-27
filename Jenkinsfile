@@ -76,8 +76,8 @@ pipeline {
                 # Run a quick unit test with pytest to verify the containerized app
                 docker rm -f ${CONTAINER_NAME} || true
                 
-                # Start the container
-                docker run -d --name ${CONTAINER_NAME} -p 8000:8000 ${IMAGE_NAME}:${IMAGE_TAG}
+                # Start the container (no port mapping needed as tests run inside)
+                docker run -d --name ${CONTAINER_NAME} ${IMAGE_NAME}:${IMAGE_TAG}
                 
                 # Wait for API to be ready
                 sleep 15
