@@ -73,14 +73,21 @@ pipeline {
         stage('Test') {
             steps {
                 sh '''
-                # Run a quick unit test with pytest to verify the containerized app
+                # Cleanup potential stale container
                 docker rm -f ${CONTAINER_NAME} || true
-                
-                # Start the container (no port mapping needed as tests run inside)
-                docker run -d --name ${CONTAINER_NAME} ${IMAGE_NAME}:${IMAGE_TAG}
+
+                # Start the container with network access and no port mapping
+                docker run -d --name ${CONTAINER_NAME} --network docker_default ${IMAGE_NAME}:${IMAGE_TAG}
                 
                 # Wait for API to be ready
-                sleep 15
+                sleep 20
+                
+                # Check if container is still running, if not show logs
+                if [ "$(docker inspect -f '{{.State.Running}}' ${CONTAINER_NAME})" != "true" ]; then
+                    echo "Container crashed! showing logs:"
+                    docker logs ${CONTAINER_NAME}
+                    exit 1
+                fi
                 
                 # Run pytest inside the container
                 docker exec ${CONTAINER_NAME} pytest tests/

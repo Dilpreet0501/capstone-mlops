@@ -2,7 +2,7 @@ pydantic>=2.0
 pydantic-settings>=2.0
 fastapi
 uvicorn
-mlflow-skinny
+mlflow
 scikit-learn
 numpy
 pandas
