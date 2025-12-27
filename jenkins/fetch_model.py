@@ -28,7 +28,10 @@ def fetch_model():
             print(f"Cleaning up old model at {DEST_DIR}")
             shutil.rmtree(DEST_DIR)
         
-        os.makedirs(os.path.dirname(DEST_DIR), exist_ok=True)
+        if os.path.dirname(DEST_DIR):
+            os.makedirs(os.path.dirname(DEST_DIR), exist_ok=True)
+        else:
+            os.makedirs(DEST_DIR, exist_ok=True)
 
         print(f"Downloading artifact from {model_uri} to {DEST_DIR}")
         local_path = mlflow.artifacts.download_artifacts(
